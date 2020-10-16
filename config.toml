@@ -94,13 +94,13 @@ disqusShortname = ""
     [[params.tiles.showcase]]
       title = "Homework 1"
       subtitle = "1st homework completed"
-      image = "pic01.jpg"
+      image = ""
       url = "blogs/blog1"
 
     [[params.tiles.showcase]]
       title = "Homework 2"
       subtitle = "2nd homework completed"
-      image = "pic02.jpg"
+      image = ""
       url = "blogs/blog2"
 
     [[params.tiles.showcase]]
