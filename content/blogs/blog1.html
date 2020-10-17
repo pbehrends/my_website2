@@ -1,0 +1,117 @@
+---
+categories:
+- ""
+- ""
+date: "2017-10-31T21:28:43-05:00"
+description: "Analysis of the death rates of COVID-19 infected patients, by admission to ICU and presence of comorbidities"
+draft: false
+image: pic10.jpg
+keywords: ""
+slug: blog1
+title: "What is the relationship between COVID deaths and presence of comorbidities and ICU admission in patients"
+---
+
+
+
+<div id="homework-2-challenge-1" class="section level1">
+<h1>Homework 2 Challenge 1</h1>
+<p>Let us revisit the <a href="https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf">CDC Covid-19 Case Surveillance Data</a>. There are well over 3 million entries of individual, de-identified patient data. Since this is a large file, I suggest you use <code>vroom</code> to load it and you keep <code>cache=TRUE</code> in the chunk options.</p>
+<pre class="r"><code># file contains 11 variables and 3.66m rows and is well over 380Mb. 
+# It will take time to download
+
+# URL link to CDC to download data
+url &lt;- &quot;https://data.cdc.gov/api/views/vbim-akqf/rows.csv?accessType=DOWNLOAD&quot;
+
+
+#Admission to ICU
+covid_data &lt;- vroom::vroom(url)%&gt;% # If vroom::vroom(url) doesn&#39;t work, use read_csv(url)
+  clean_names()
+
+covid_data_clean &lt;- covid_data %&gt;% 
+ filter(death_yn %in% c(&quot;Yes&quot;, &quot;No&quot;), 
+        sex %in% c(&quot;Male&quot;, &quot;Female&quot;),
+        icu_yn %in% c(&quot;Yes&quot;, &quot;No&quot;),
+        age_group != &quot;Unknown&quot;) %&gt;% 
+  
+  select(death_yn,age_group, sex, icu_yn) %&gt;% 
+  
+  group_by(age_group, sex, icu_yn) %&gt;% 
+  
+  summarise(death = sum(death_yn == &quot;Yes&quot;), total= n()) %&gt;% 
+  
+  mutate(death_rate = death/total)
+  
+  
+ICU_deaths_plot &lt;- ggplot(covid_data_clean,
+                               mapping = aes(x = age_group, 
+                                y = death_rate))+
+  geom_col(fill = &quot;#FF9582&quot;)+
+ facet_grid(cols = vars(sex),
+             rows = vars(factor(icu_yn, ordered = TRUE, 
+                                 levels = c(&quot;Yes&quot;,&quot;No&quot;),
+                                 labels = c(&quot;Admitted to ICU&quot;,
+                                            &quot;Not ICU&quot;)))) + 
+  theme_bw()+
+  scale_y_continuous(labels = scales::percent)+
+  coord_flip()+
+  geom_text(size=3, aes(label = round(100*death_rate,digits = 1),
+                y = death_rate + 0.05))+
+  labs(title = &quot;Covid death % by age group, sex and whether patient was admitted to ICU&quot;, 
+       x =&quot;&quot;, 
+       y=&quot;&quot;, 
+       caption = &quot;Source: CDC&quot;)
+  
+ICU_deaths_plot</code></pre>
+<p><img src="/blogs/blog1_files/figure-html/unnamed-chunk-1-1.png" width="648" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#save the picture
+ggsave(&quot;ICU_yesno.jpg&quot;,plot=ICU_deaths_plot, width = 15,height = 10)
+
+#place the picture in code
+knitr::include_graphics(here::here(&quot;ICU_yesno.jpg&quot;))</code></pre>
+<p><img src="C:/Users/behre/Documents/my_website/my_website2/ICU_yesno.jpg" width="2250" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#effect of comorbidity
+
+covid_data_clean_comorb &lt;- covid_data %&gt;% 
+ filter(death_yn %in% c(&quot;Yes&quot;, &quot;No&quot;), 
+        sex %in% c(&quot;Male&quot;, &quot;Female&quot;),
+        medcond_yn %in% c(&quot;Yes&quot;, &quot;No&quot;),
+        age_group != &quot;Unknown&quot;) %&gt;% 
+  
+  select(death_yn,age_group, sex, medcond_yn) %&gt;% 
+  
+  group_by(age_group, sex, medcond_yn) %&gt;% 
+  
+  summarise(death = sum(death_yn == &quot;Yes&quot;), total= n()) %&gt;% 
+  
+  mutate(death_rate = death/total)
+  
+  
+    
+co_morbid_deaths_plot &lt;- ggplot(covid_data_clean_comorb,
+                               mapping = aes(x = age_group, 
+                                y = death_rate))+
+  geom_col(fill = &quot;#6B7CA4&quot;)+
+ facet_grid(cols = vars(sex),
+             rows = vars(factor(medcond_yn, ordered = TRUE, 
+                                 levels = c(&quot;Yes&quot;,&quot;No&quot;),
+                                 labels = c(&quot;With comorbidities&quot;,
+                                            &quot;Without comorbidities&quot;)))) + 
+  theme_bw()+
+  scale_y_continuous(labels = scales::percent)+
+  coord_flip()+
+  geom_text(size=3, aes(label = round(100*death_rate,digits = 1),
+                y = death_rate + 0.05))+
+  labs(title = &quot;Covid death % by age group, sex and presence of co-morbidities&quot;, 
+       x =&quot;&quot;, 
+       y=&quot;&quot;, 
+       caption = &quot;Source: CDC&quot;)
+
+co_morbid_deaths_plot</code></pre>
+<p><img src="/blogs/blog1_files/figure-html/unnamed-chunk-1-3.png" width="648" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#save the picture
+ggsave(&quot;co_morbidities.jpg&quot;,plot=co_morbid_deaths_plot, width = 15,height = 10)
+
+#place the picture in code
+knitr::include_graphics(here::here(&quot;co_morbidities.jpg&quot;))</code></pre>
+<p><img src="C:/Users/behre/Documents/my_website/my_website2/co_morbidities.jpg" width="2250" style="display: block; margin: auto;" /></p>
+</div>

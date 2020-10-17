@@ -1,0 +1,195 @@
+<!DOCTYPE HTML>
+<html>
+
+    <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="description" content="Masters in Financial Analysis Student at the London Business School">
+	<meta name="author" content="Paul Behrends">
+	<meta name="generator" content="Hugo 0.76.3" />
+	<title>Cities with the highest amounts in political contributions in California during the 2016 US Presidential election &middot; Portfolio website for Paul Behrends</title>
+	<!-- Stylesheets -->
+	
+	<link rel="stylesheet" href="/css/main.css"/>
+	
+	
+
+	
+
+	<!-- Custom Fonts -->
+	<link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+	
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="js/ie/html5shiv.js"></script>
+	<script src="js/ie/html5shiv.jsrespond.min.js"></script>
+	<![endif]-->
+</head>
+
+    <body>
+
+    <!-- Wrapper -->
+        <div id="wrapper">
+
+            <!-- Header -->
+    <header id="header" class="alt">
+        <a href="/" class="logo"><strong>Paul Behrends</strong> <span>LBS student</span></a>
+        <nav>
+            <a href="#menu">Menu</a>
+        </nav>
+    </header>
+
+<!-- Menu -->
+    <nav id="menu">
+        <ul class="links">
+            
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/blogs">Blogs</a></li>
+            
+
+        </ul>
+        <ul class="actions vertical">
+            
+                <li><a href="/blogs" class="button special fit">Get Started</a></li>
+            
+            
+                <li><a href="/" class="button fit">Log In</a></li>
+            
+        </ul>
+    </nav>
+
+        <!-- Main -->
+            <div id="main" class="alt">
+
+                
+                    <section id="one">
+                        <div class="inner">
+                            <header class="major">
+                                <h1>Cities with the highest amounts in political contributions in California during the 2016 US Presidential election</h1>
+                            </header>
+                            
+                                <span class="image main"><img src="/img/blogs/pic09.jpg" alt="" /></span>
+                            
+                            
+
+
+<p>As discussed in class, I would like you to reproduce the plot that shows the top ten cities in highest amounts raised in political contributions in California during the 2016 US Presidential election.</p>
+<p><img src="C:/Users/behre/Documents/my_website/my_website2/images/challenge2.png" width="100%" /></p>
+<pre class="r"><code>CA_contributors_2016 &lt;- vroom::vroom(here::here(&quot;data&quot;,&quot;CA_contributors_2016.csv&quot;))
+Zip_codes &lt;- vroom::vroom(here::here(&quot;data&quot;,&quot;zip_code_database.csv&quot;))
+
+Zip_codes_clean &lt;- filter(Zip_codes, state == &quot;CA&quot;)
+
+Cali_contributors &lt;- CA_contributors_2016 %&gt;%
+  filter(cand_nm %in% c(&quot;Clinton, Hillary Rodham&quot;,&quot;Trump, Donald J.&quot;))
+
+joint_zip &lt;- merge(Cali_contributors, Zip_codes_clean, &quot;zip&quot;)
+
+new_data &lt;- joint_zip %&gt;%
+  group_by(cand_nm) %&gt;%
+  count(primary_city, wt = contb_receipt_amt, sort = TRUE)
+
+new_data %&gt;%
+  group_by(cand_nm) %&gt;%
+  top_n(10) %&gt;%
+  ungroup %&gt;%
+  mutate(cand_nm = factor(cand_nm),
+    primary_city = reorder_within(primary_city, n, cand_nm)) %&gt;%
+  ggplot(aes(x = primary_city, y = n, fill = cand_nm)) +
+  geom_col(show.legend = FALSE) +
+  
+  scale_fill_manual(values = c(&quot;Clinton, Hillary Rodham&quot; = &quot;blue&quot;,&quot;Trump, Donald J.&quot; = &quot;red&quot;)) +
+  facet_wrap(~cand_nm, scales = &#39;free&#39;) +
+  scale_x_reordered() +
+  scale_y_continuous(labels = label_dollar()) +
+  theme_bw() +
+  labs(y = &quot;Raised Amount&quot;,
+       x = &quot;&quot;,
+       title = &quot;Where did the candidates raise most of their money?&quot;) +
+  coord_flip() </code></pre>
+<p><img src="/blogs/blog2_files/figure-html/load_CA_data-1.png" width="648" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>CA_contributors_top10 &lt;- CA_contributors_2016 %&gt;%
+  group_by(cand_nm) %&gt;%
+  summarise(total_contr = sum(contb_receipt_amt)) %&gt;%
+  arrange(desc(total_contr)) %&gt;%
+  head(10) 
+top10_contributors &lt;- CA_contributors_top10$cand_nm
+
+Cali_top_10 &lt;- CA_contributors_2016 %&gt;%
+  filter(cand_nm %in% top10_contributors)
+
+merged_top_10 &lt;- merge(Cali_top_10,Zip_codes_clean,&quot;zip&quot;) 
+
+
+total_data &lt;- merged_top_10 %&gt;%
+  group_by(cand_nm) %&gt;%
+  count(primary_city, wt = contb_receipt_amt, sort = TRUE)
+
+candm_shade &lt;- c(&quot;Bush, Jeb&quot;  = &quot;red&quot;,
+                 &quot;Carson, Benjamin S.&quot; =&quot;red&quot;,
+                 &quot;Clinton, Hillary Rodham&quot; = &quot;blue&quot;,
+                 &quot;Cruz, Rafael Edward &#39;Ted&#39;&quot; =&quot;red&quot;,
+                 &quot;Fiorina, Carly&quot; =&quot;red&quot;,
+                 &quot;Kasich, John R.&quot; =&quot;red&quot;,
+                 &quot;Paul, Rand&quot; =&quot;red&quot;,
+                 &quot;Rubio, Marco&quot; =&quot;red&quot;,
+                 &quot;Sanders, Bernard&quot; = &quot;blue&quot;,
+                 &quot;Trump, Donald J.&quot; = &quot;red&quot;)
+
+total_data %&gt;%
+  group_by(cand_nm) %&gt;%
+  top_n(10) %&gt;%
+  ungroup %&gt;%
+  mutate(cand_nm = factor(cand_nm),
+    primary_city = reorder_within(primary_city, n, cand_nm)) %&gt;%
+  ggplot(aes(x = primary_city, y = n, fill = cand_nm)) +
+  geom_col(show.legend = FALSE) +
+  scale_fill_manual(values = candm_shade) +
+  facet_wrap(~cand_nm, scales = &quot;free&quot;,nrow = 4, ncol = 3) +
+  scale_x_reordered() +
+  scale_y_continuous(labels = label_dollar()) +
+  theme_bw() +
+  labs(y = &quot;Raised Amount&quot;,
+       x = &quot;&quot;,
+       title = &quot;Where did the Top 10 presidential candidates raise the highest contributions?&quot;) +
+  coord_flip() </code></pre>
+<p><img src="/blogs/blog2_files/figure-html/load_CA_data-2.png" width="648" style="display: block; margin: auto;" /></p>
+
+                        </div>
+                    </section>
+            <!-- Disqus Inject -->
+                
+            </div>
+            
+        <!-- Footer -->
+            
+        </div>
+
+    <!-- Scripts -->
+        <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+
+    
+
+    <!-- Main JS -->
+    <script src="/js/main.js"></script>
+
+    
+
+    
+
+    </body>
+</html>

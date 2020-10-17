@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Portfolio website for Paul Behrends</title>
+    <link>/</link>
+    <description>Recent content on Portfolio website for Paul Behrends</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 31 Oct 2017 22:42:51 -0500</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Aliquam</title>
+      <link>/blogs/aliquam/</link>
+      <pubDate>Tue, 31 Oct 2017 22:42:51 -0500</pubDate>
+      
+      <guid>/blogs/aliquam/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Tempus</title>
+      <link>/blogs/tempus/</link>
+      <pubDate>Tue, 31 Oct 2017 22:26:13 -0500</pubDate>
+      
+      <guid>/blogs/tempus/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Cities with the highest amounts in political contributions in California during the 2016 US Presidential election</title>
+      <link>/blogs/blog2/</link>
+      <pubDate>Tue, 31 Oct 2017 22:26:09 -0500</pubDate>
+      
+      <guid>/blogs/blog2/</guid>
+      <description>As discussed in class, I would like you to reproduce the plot that shows the top ten cities in highest amounts raised in political contributions in California during the 2016 US Presidential election.
+CA_contributors_2016 &amp;lt;- vroom::vroom(here::here(&amp;quot;data&amp;quot;,&amp;quot;CA_contributors_2016.csv&amp;quot;))Zip_codes &amp;lt;- vroom::vroom(here::here(&amp;quot;data&amp;quot;,&amp;quot;zip_code_database.csv&amp;quot;))Zip_codes_clean &amp;lt;- filter(Zip_codes, state == &amp;quot;CA&amp;quot;)Cali_contributors &amp;lt;- CA_contributors_2016 %&amp;gt;%filter(cand_nm %in% c(&amp;quot;Clinton, Hillary Rodham&amp;quot;,&amp;quot;Trump, Donald J.&amp;quot;))joint_zip &amp;lt;- merge(Cali_contributors, Zip_codes_clean, &amp;quot;zip&amp;quot;)new_data &amp;lt;- joint_zip %&amp;gt;%group_by(cand_nm) %&amp;gt;%count(primary_city, wt = contb_receipt_amt, sort = TRUE)new_data %&amp;gt;%group_by(cand_nm) %&amp;gt;%top_n(10) %&amp;gt;%ungroup %&amp;gt;%mutate(cand_nm = factor(cand_nm),primary_city = reorder_within(primary_city, n, cand_nm)) %&amp;gt;%ggplot(aes(x = primary_city, y = n, fill = cand_nm)) +geom_col(show.</description>
+    </item>
+    
+    <item>
+      <title>What is the relationship between COVID deaths and presence of comorbidities and ICU admission in patients</title>
+      <link>/blogs/blog1/</link>
+      <pubDate>Tue, 31 Oct 2017 21:28:43 -0500</pubDate>
+      
+      <guid>/blogs/blog1/</guid>
+      <description>Homework 2 Challenge 1Let us revisit the CDC Covid-19 Case Surveillance Data. There are well over 3 million entries of individual, de-identified patient data. Since this is a large file, I suggest you use vroom to load it and you keep cache=TRUE in the chunk options.
+# file contains 11 variables and 3.66m rows and is well over 380Mb. # It will take time to download# URL link to CDC to download dataurl &amp;lt;- &amp;quot;https://data.</description>
+    </item>
+    
+    <item>
+      <title>Hello R Markdown</title>
+      <link>/post/2015-07-23-r-rmarkdown/</link>
+      <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
+      
+      <guid>/post/2015-07-23-r-rmarkdown/</guid>
+      <description>R MarkdownThis is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
+You can embed an R code chunk like this:
+summary(cars)## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.98 ## 3rd Qu.</description>
+    </item>
+    
+  </channel>
+</rss>
